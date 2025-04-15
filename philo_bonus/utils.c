@@ -6,11 +6,35 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/10 16:04:45 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/15 18:32:55 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+int	get_ms(int start)
+{
+	struct timeval	tv;
+	int				ms;
+
+	gettimeofday(&tv, NULL);
+	ms = ((tv.tv_sec * 1000) + (tv.tv_usec / 1000)) - start;
+	return (ms);
+}
+
+void	smart_sleep(long duration_ms)
+{
+	long	start;
+	long	now;
+
+	start = get_ms(0);
+	now = get_ms(start);
+	while (now < duration_ms)
+	{
+		usleep(100);
+		now = get_ms(start);
+	}
+}
 
 int	check(char **argv)
 {
@@ -28,22 +52,31 @@ int	check(char **argv)
 	return (0);
 }
 
-void	*free_all(t_data *data, pthread_mutex_t *forks)
+long	ft_atoi(const char *str)
 {
-	int	i;
+	unsigned int	i;
+	int				num;
+	int				segno;
+	int				cont;
 
-	if (forks)
+	num = 0;
+	segno = 1;
+	i = 0;
+	cont = 0;
+	while ((str[i] >= 9 && str[i] <= 13) || str[i] == 32)
+		i++;
+	while (str[i] == '+' || str[i] == '-')
 	{
-		i = 0;
-		while (i < data->philo_count)
-		{
-			pthread_mutex_destroy(&forks[i]);
-			i++;
-		}
-		free(forks);
+		cont++;
+		if (str[i] == '-')
+			segno = -segno;
+		i++;
 	}
-	if (data->philos)
-		free(data->philos);
-	free(data);
-	return (NULL);
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		num = num * 10 + (str[i++] - 48);
+		if (cont > 1 || (num > IMAX && segno == 1))
+			return (-1);
+	}
+	return (num * segno);
 }

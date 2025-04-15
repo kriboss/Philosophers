@@ -6,34 +6,29 @@
 #    By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/28 18:07:11 by kbossio           #+#    #+#              #
-#    Updated: 2025/04/10 15:57:39 by kbossio          ###   ########.fr        #
+#    Updated: 2025/04/15 18:03:24 by kbossio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 CC = cc -Wall -Wextra -Werror
-INCLUDES = -I. -Ilibft
-SRCS = philosophers.c utils.c
+INCLUDES = -I.
+SRCS = philosophers.c utils.c routine.c
 OBJS = $(SRCS:.c=.o)
 
-%.o: %.c | make_libft
+%.o: %.c
 	$(CC) $(INCLUDES) -c $< -o $@
 
-$(NAME): $(OBJS) | make_libft
-	$(CC) $(OBJS) -Llibft -lft -o $(NAME)
+$(NAME): $(OBJS)
+	$(CC) $(OBJS) -lpthread -o $(NAME)
 
 all: $(NAME)
 
-make_libft:
-	make -C libft
-
 clean:
 	rm -f $(OBJS)
-	make clean -C libft
 
 fclean: clean
 	rm -f $(NAME)
-	make fclean -C libft
 
 re: fclean all
 
