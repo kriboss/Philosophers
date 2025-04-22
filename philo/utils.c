@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/15 18:54:33 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/22 18:02:55 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	*free_all(t_data *data, pthread_mutex_t *forks)
 	if (forks)
 	{
 		i = 0;
-		while (i < data->philo_count)
+		while (i < data->philo_count + 3)
 		{
 			pthread_mutex_destroy(&forks[i]);
 			i++;

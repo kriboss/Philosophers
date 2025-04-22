@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:40:53 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/15 18:54:44 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/22 18:30:33 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,6 @@ long	ft_atoi(const char *str);
 int		get_ms(int start);
 int		smart_sleep(long duration_ms, long ttd);
 void	*lone_philo(void *arg);
-void	*routine(void *arg);
+void	routine(t_philo *philo, int n);
 
 #endif

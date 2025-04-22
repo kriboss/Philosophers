@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:40:53 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/15 18:55:04 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/22 17:56:23 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct s_philo
 {
 	int				id;
 	int				te;
+	int				l;
 	int				last_eat;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
@@ -40,6 +41,9 @@ typedef struct s_data
 	int		time_to_die;
 	int		ne;
 	int		stop;
+	pthread_mutex_t	*print;
+	pthread_mutex_t	*s;
+	pthread_mutex_t	*l;
 	t_philo	*philos;
 }	t_data;
 
