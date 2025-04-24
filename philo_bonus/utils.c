@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/15 18:32:55 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/24 18:19:43 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	get_ms(int start)
 	return (ms);
 }
 
-void	smart_sleep(long duration_ms)
+int	smart_sleep(long duration_ms, long ttd)
 {
 	long	start;
 	long	now;
@@ -33,7 +33,33 @@ void	smart_sleep(long duration_ms)
 	{
 		usleep(100);
 		now = get_ms(start);
+		if (now >= ttd)
+			return (1);
 	}
+	return (0);
+}
+
+void	free_all(t_data *data, pid_t *pid)
+{
+	int	i;
+
+	i = 0;
+	if (data)
+	{
+		free_sem(data);
+		if (data->philos)
+			free(data->philos);
+		free(data);
+	}
+	if (pid == 0)
+	{
+		while (i < data->philo_count)
+			kill(pid[i++], SIGKILL);
+	}
+	if (pid)
+		free(pid);
+	else
+		printf("Error\n");
 }
 
 int	check(char **argv)

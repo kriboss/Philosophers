@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 18:02:45 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/22 18:16:43 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/24 18:47:37 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	behaviour(t_philo *p, int start)
 		if (smart_sleep(p->data->time_to_eat, p->data->time_to_die) || check_stop(p))
 			break ;
 		eat(p, start);
-		if (smart_sleep(p->data->time_to_eat, p->data->time_to_die) || check_stop(p)
+		if (p->data->time_to_die <= get_ms(p->last_eat) || check_stop(p)
 			|| (p->data->ne != -1 && p->te >= p->data->ne))
 			break ;
 		print("%dms %d is sleeping\n", get_ms(start), p);

@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/22 18:02:55 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/24 15:24:03 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int	check(char **argv)
 	return (0);
 }
 
-void	*free_all(t_data *data, pthread_mutex_t *forks)
+void	free_all(t_data *data, pthread_mutex_t *forks)
 {
 	int	i;
 
@@ -72,7 +72,6 @@ void	*free_all(t_data *data, pthread_mutex_t *forks)
 	if (data->philos)
 		free(data->philos);
 	free(data);
-	return (NULL);
 }
 
 long	ft_atoi(const char *str)

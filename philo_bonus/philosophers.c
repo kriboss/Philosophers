@@ -6,44 +6,104 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:34:18 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/22 18:44:54 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/24 18:26:52 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
+void	free_sem(t_data *d)
+{
+	if (d->forks)
+	{
+		sem_close(d->forks);
+		sem_unlink("/forks");
+	}
+	if (d->print)
+	{
+		sem_close(d->print);
+		sem_unlink("/print");
+	}
+	if (d->s)
+	{
+		sem_close(d->s);
+		sem_unlink("/s");
+	}
+	if (d->l)
+	{
+		sem_close(d->l);
+		sem_unlink("/l");
+	}
+}
+
 void	init(t_data *d, int argc, char *argv[], int n)
 {
+	int	i;
+
+	i = 0;
 	d->philo_count = n;
 	d->time_to_die = ft_atoi(argv[2]);
 	d->time_to_eat = ft_atoi(argv[3]);
 	d->time_to_sleep = ft_atoi(argv[4]);
 	d->ne = -1;
+	d->stop = 0;
 	if (argc == 6)
 		d->ne = ft_atoi(argv[5]);
+	while (i < n)
+	{
+		d->philos[i].id = i + 1;
+		d->philos[i].te = 0;
+		d->philos[i].last_eat = 0;
+		d->philos[i++].data = d;
+	}
+}
+
+t_data	*create(int n, int argc, char *argv[])
+{
+	t_data	*d;
+
+	d = malloc(sizeof(t_data));
+	if (!d)
+		return (printf("Error\n"), NULL);
+	d->forks = sem_open("/forks", O_CREAT, 0644, n);
+	if (d->forks == SEM_FAILED)
+		return (printf("Error\n"), free(d), NULL);
+	d->print = sem_open("/print", O_CREAT, 0644, NULL);
+	if (d->print == SEM_FAILED)
+		return (printf("Error\n"), free(d), free_sem(d), NULL);
+	d->s = sem_open("/s", O_CREAT, 0644, 1);
+	if (d->s == SEM_FAILED)
+		return (printf("Error\n"), free(d), free_sem(d), NULL);
+	d->l = sem_open("/l", O_CREAT, 0644, 1);
+	if (d->l == SEM_FAILED)
+		return (printf("Error\n"), free(d), free_sem(d), NULL);
+	d->philos = malloc(sizeof(t_philo) * n);
+	if (!d->philos)
+		return (printf("Error\n"), free(d), free_sem(d), NULL);
+	init(d, argc, argv, n);
+	return (d);
 }
 
 int	main(int argc, char **argv)
 {
 	int				n;
 	int				i;
-	pthread_t		*threads;
 	t_data			*d;
+	pid_t			*pid;
 
+	i = 0;
 	if ((argc != 5 && argc != 6) || check(argv) || ft_atoi(argv[1]) > 200)
 		return (printf("Error\n"), 1);
 	(void)argc;
 	n = ft_atoi(argv[1]);
-	i = 0;
-	threads = malloc(sizeof(pthread_t) * n);
-	if (!threads)
-		return (printf("Error\n"), 1);
-	d = malloc(sizeof(t_data));
+	d = create(n, argc, argv);
 	if (!d)
-		return (printf("Error\n"), free(threads), 1);
-	d->philos = malloc(sizeof(t_philo) * n);
-	if (!d->philos)
-		return (printf("Error\n"), free(threads), free(d), 1);
-	routine(d->philos, n);
+		return (1);
+	pid = malloc(sizeof(pid_t) * n);
+	if (!pid)
+		return (printf("Error\n"), free(d), free_sem(d), 1);
+	while (i < n)
+		pid[i++] = -1;
+	start(d->philos, n, pid);
 	return (0);
 }
