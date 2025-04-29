@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/24 18:19:43 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/29 19:01:40 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,6 @@ void	free_all(t_data *data, pid_t *pid)
 	int	i;
 
 	i = 0;
-	if (data)
-	{
-		free_sem(data);
-		if (data->philos)
-			free(data->philos);
-		free(data);
-	}
 	if (pid == 0)
 	{
 		while (i < data->philo_count)
@@ -58,6 +51,13 @@ void	free_all(t_data *data, pid_t *pid)
 	}
 	if (pid)
 		free(pid);
+	if (data)
+	{
+		free_sem(data);
+		if (data->philos)
+			free(data->philos);
+		free(data);
+	}
 	else
 		printf("Error\n");
 }

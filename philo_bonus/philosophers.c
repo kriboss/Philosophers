@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:34:18 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/24 18:26:52 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/04/29 19:46:39 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,15 @@ void	free_sem(t_data *d)
 		sem_close(d->print);
 		sem_unlink("/print");
 	}
-	if (d->s)
-	{
-		sem_close(d->s);
-		sem_unlink("/s");
-	}
 	if (d->l)
 	{
 		sem_close(d->l);
 		sem_unlink("/l");
+	}
+	if (d->s)
+	{
+		sem_close(d->s);
+		sem_unlink("/s");
 	}
 }
 
@@ -46,7 +46,6 @@ void	init(t_data *d, int argc, char *argv[], int n)
 	d->time_to_eat = ft_atoi(argv[3]);
 	d->time_to_sleep = ft_atoi(argv[4]);
 	d->ne = -1;
-	d->stop = 0;
 	if (argc == 6)
 		d->ne = ft_atoi(argv[5]);
 	while (i < n)
@@ -54,6 +53,7 @@ void	init(t_data *d, int argc, char *argv[], int n)
 		d->philos[i].id = i + 1;
 		d->philos[i].te = 0;
 		d->philos[i].last_eat = 0;
+		d->philos[i].turn = 0;
 		d->philos[i++].data = d;
 	}
 }
@@ -67,19 +67,19 @@ t_data	*create(int n, int argc, char *argv[])
 		return (printf("Error\n"), NULL);
 	d->forks = sem_open("/forks", O_CREAT, 0644, n);
 	if (d->forks == SEM_FAILED)
-		return (printf("Error\n"), free(d), NULL);
-	d->print = sem_open("/print", O_CREAT, 0644, NULL);
+		return (printf("Error\n"), free_sem(d), free(d), NULL);
+	d->print = sem_open("/print", O_CREAT, 0644, 1);
 	if (d->print == SEM_FAILED)
-		return (printf("Error\n"), free(d), free_sem(d), NULL);
+		return (printf("Error\n"), free_sem(d), free(d), NULL);
 	d->s = sem_open("/s", O_CREAT, 0644, 1);
 	if (d->s == SEM_FAILED)
-		return (printf("Error\n"), free(d), free_sem(d), NULL);
+		return (printf("Error\n"), free_sem(d), free(d), NULL);
 	d->l = sem_open("/l", O_CREAT, 0644, 1);
 	if (d->l == SEM_FAILED)
-		return (printf("Error\n"), free(d), free_sem(d), NULL);
+		return (printf("Error\n"), free_sem(d), free(d), NULL);
 	d->philos = malloc(sizeof(t_philo) * n);
 	if (!d->philos)
-		return (printf("Error\n"), free(d), free_sem(d), NULL);
+		return (printf("Error\n"), free_sem(d), free(d), NULL);
 	init(d, argc, argv, n);
 	return (d);
 }
@@ -89,21 +89,24 @@ int	main(int argc, char **argv)
 	int				n;
 	int				i;
 	t_data			*d;
-	pid_t			*pid;
 
 	i = 0;
 	if ((argc != 5 && argc != 6) || check(argv) || ft_atoi(argv[1]) > 200)
 		return (printf("Error\n"), 1);
 	(void)argc;
 	n = ft_atoi(argv[1]);
+	sem_unlink("/forks");
+	sem_unlink("/print");
+	sem_unlink("/s");
+	sem_unlink("/l");
 	d = create(n, argc, argv);
 	if (!d)
 		return (1);
-	pid = malloc(sizeof(pid_t) * n);
-	if (!pid)
-		return (printf("Error\n"), free(d), free_sem(d), 1);
+	d->pid = malloc(sizeof(pid_t) * n);
+	if (!d->pid)
+		return (printf("Error\n"), free_sem(d), free(d), free(d->philos), 1);
 	while (i < n)
-		pid[i++] = -1;
-	start(d->philos, n, pid);
+		d->pid[i++] = -1;
+	start(d->philos, n);
 	return (0);
 }
