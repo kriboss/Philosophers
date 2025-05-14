@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:40:53 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/29 19:28:52 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/05/14 12:13:44 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct s_philo
 	int				last_eat;
 	int				l;
 	int				turn;
+	int				died;
 	t_data			*data;
 }	t_philo;
 

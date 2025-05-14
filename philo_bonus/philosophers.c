@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:34:18 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/29 19:46:39 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/05/14 12:39:52 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ void	init(t_data *d, int argc, char *argv[], int n)
 		d->philos[i].id = i + 1;
 		d->philos[i].te = 0;
 		d->philos[i].last_eat = 0;
+		d->philos[i].died = 0;
 		d->philos[i].turn = 0;
 		d->philos[i++].data = d;
 	}
@@ -74,7 +75,7 @@ t_data	*create(int n, int argc, char *argv[])
 	d->s = sem_open("/s", O_CREAT, 0644, 1);
 	if (d->s == SEM_FAILED)
 		return (printf("Error\n"), free_sem(d), free(d), NULL);
-	d->l = sem_open("/l", O_CREAT, 0644, 1);
+	d->l = sem_open("/l", O_CREAT, 0644, n / 2);
 	if (d->l == SEM_FAILED)
 		return (printf("Error\n"), free_sem(d), free(d), NULL);
 	d->philos = malloc(sizeof(t_philo) * n);
