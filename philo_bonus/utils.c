@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/29 19:01:40 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/05/20 15:32:33 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,14 +41,6 @@ int	smart_sleep(long duration_ms, long ttd)
 
 void	free_all(t_data *data, pid_t *pid)
 {
-	int	i;
-
-	i = 0;
-	if (pid == 0)
-	{
-		while (i < data->philo_count)
-			kill(pid[i++], SIGKILL);
-	}
 	if (pid)
 		free(pid);
 	if (data)

@@ -6,11 +6,25 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:34:18 by kbossio           #+#    #+#             */
-/*   Updated: 2025/05/14 12:39:52 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/05/20 14:40:47 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+int	lone_philo(t_philo *p)
+{
+	int	start;
+
+	start = get_ms(0);
+	p->last_eat = start;
+	sem_wait(p->data->forks);
+	print("%dms %d has taken a fork\n", get_ms(start), p);
+	while (get_ms(p->last_eat) < p->data->time_to_die)
+		;
+	print("%dms %d has died\n", get_ms(start), p);
+	return (free_all(p->data, p->data->pid), 0);
+}
 
 void	free_sem(t_data *d)
 {
@@ -23,11 +37,6 @@ void	free_sem(t_data *d)
 	{
 		sem_close(d->print);
 		sem_unlink("/print");
-	}
-	if (d->l)
-	{
-		sem_close(d->l);
-		sem_unlink("/l");
 	}
 	if (d->s)
 	{
@@ -53,8 +62,6 @@ void	init(t_data *d, int argc, char *argv[], int n)
 		d->philos[i].id = i + 1;
 		d->philos[i].te = 0;
 		d->philos[i].last_eat = 0;
-		d->philos[i].died = 0;
-		d->philos[i].turn = 0;
 		d->philos[i++].data = d;
 	}
 }
@@ -72,11 +79,8 @@ t_data	*create(int n, int argc, char *argv[])
 	d->print = sem_open("/print", O_CREAT, 0644, 1);
 	if (d->print == SEM_FAILED)
 		return (printf("Error\n"), free_sem(d), free(d), NULL);
-	d->s = sem_open("/s", O_CREAT, 0644, 1);
+	d->s = sem_open("/s", O_CREAT, 0644, 0);
 	if (d->s == SEM_FAILED)
-		return (printf("Error\n"), free_sem(d), free(d), NULL);
-	d->l = sem_open("/l", O_CREAT, 0644, n / 2);
-	if (d->l == SEM_FAILED)
 		return (printf("Error\n"), free_sem(d), free(d), NULL);
 	d->philos = malloc(sizeof(t_philo) * n);
 	if (!d->philos)
@@ -99,13 +103,12 @@ int	main(int argc, char **argv)
 	sem_unlink("/forks");
 	sem_unlink("/print");
 	sem_unlink("/s");
-	sem_unlink("/l");
 	d = create(n, argc, argv);
 	if (!d)
 		return (1);
 	d->pid = malloc(sizeof(pid_t) * n);
 	if (!d->pid)
-		return (printf("Error\n"), free_sem(d), free(d), free(d->philos), 1);
+		return (printf("Error\n"), free_sem(d), free(d->philos), free(d), 1);
 	while (i < n)
 		d->pid[i++] = -1;
 	start(d->philos, n);

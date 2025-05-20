@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:40:53 by kbossio           #+#    #+#             */
-/*   Updated: 2025/05/14 12:13:44 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/05/20 15:02:16 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,6 @@ typedef struct s_philo
 	int				id;
 	int				te;
 	int				last_eat;
-	int				l;
-	int				turn;
-	int				died;
 	t_data			*data;
 }	t_philo;
 
@@ -44,11 +41,11 @@ typedef struct s_data
 	int		time_to_sleep;
 	int		time_to_die;
 	int		ne;
+	int		start;
 	pid_t	*pid;
 	sem_t	*forks;
 	sem_t	*print;
 	sem_t	*s;
-	sem_t	*l;
 	t_philo	*philos;
 }	t_data;
 
@@ -57,9 +54,10 @@ int		check(char **argv);
 long	ft_atoi(const char *str);
 int		get_ms(int start);
 int		smart_sleep(long duration_ms, long ttd);
-void	*lone_philo(void *arg);
+void	print(char *str, int start, t_philo *p);
+int		lone_philo(t_philo *p);
 void	free_sem(t_data *d);
 void	free_all(t_data *data, pid_t *pid);
-void	start(t_philo *p, int n);
+int		start(t_philo *p, int n);
 
 #endif
