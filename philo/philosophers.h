@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:40:53 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/24 15:24:11 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/09/23 22:32:11 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef struct s_philo
 	int				id;
 	int				te;
 	int				l;
-	int				last_eat;
+	long long		last_eat;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data			*data;
@@ -41,19 +41,22 @@ typedef struct s_data
 	int		time_to_die;
 	int		ne;
 	int		stop;
+	int		full;
 	pthread_mutex_t	*print;
 	pthread_mutex_t	*s;
 	pthread_mutex_t	*l;
+	pthread_mutex_t	*eat_lock;
 	t_philo	*philos;
 }	t_data;
 
-int		get_ms(int start);
-int		check(char **argv);
-void	free_all(t_data *data, pthread_mutex_t *forks);
-long	ft_atoi(const char *str);
-int		get_ms(int start);
-int		smart_sleep(long duration_ms, long ttd);
-void	*lone_philo(void *arg);
-void	*routine(void *arg);
+long long	get_ms(long long start);
+int			check(char **argv);
+void		free_all(t_data *data, pthread_mutex_t *forks);
+long		ft_atoi(const char *str);
+int			smart_sleep(long long duration_ms);
+void		*lone_philo(void *arg);
+void		*routine(void *arg);
+int			check_stop(t_philo *p);
+void		*monitoring(void *arg);
 
 #endif

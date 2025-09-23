@@ -6,38 +6,37 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/24 15:24:03 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/09/23 21:52:53 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int	get_ms(int start)
+long long	get_ms(long long start)
 {
 	struct timeval	tv;
-	int				ms;
+	long long		ms;
 
 	gettimeofday(&tv, NULL);
 	ms = ((tv.tv_sec * 1000) + (tv.tv_usec / 1000)) - start;
 	return (ms);
 }
 
-int	smart_sleep(long duration_ms, long ttd)
+int	smart_sleep(long long duration_ms)
 {
-	long	start;
-	long	now;
+	long long	start;
+	long long	now;
 
 	start = get_ms(0);
 	now = get_ms(start);
 	while (now < duration_ms)
 	{
-		usleep(100);
+		usleep(50);
 		now = get_ms(start);
-		if (now >= ttd)
-			return (1);
 	}
 	return (0);
 }
+
 
 int	check(char **argv)
 {

@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/28 13:34:18 by kbossio           #+#    #+#             */
-/*   Updated: 2025/04/22 18:16:50 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/09/23 22:32:33 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,20 @@ void	*lone_philo(void *arg)
 	start = get_ms(0);
 	while (philos->data->time_to_die > get_ms(start))
 	{
-		printf("%dms %d is sleeping\n", get_ms(start), philos->id);
-		if (smart_sleep(philos->data->time_to_sleep, philos->data->time_to_die))
+		printf("%lldms %d is sleeping\n", get_ms(start), philos->id);
+		if (smart_sleep(philos->data->time_to_sleep))
 			break ;
-		printf("%dms %d is thinking\n", get_ms(start), philos->id);
+		printf("%lldms %d is thinking\n", get_ms(start), philos->id);
 	}
-	printf("%dms %d died\n", get_ms(start), philos->id);
+	printf("%lldms %d died\n", get_ms(start), philos->id);
 	pthread_exit(NULL);
 }
 
-void	start(int n, pthread_t *threads, t_data *d, pthread_mutex_t *forks)
+void	start(int n, pthread_t *threads, t_data *d, pthread_mutex_t *forks, pthread_t *monitor)
 {
 	int	i;
 
+	(void) monitor;
 	i = 0;
 	if (n == 1)
 	{
@@ -42,6 +43,7 @@ void	start(int n, pthread_t *threads, t_data *d, pthread_mutex_t *forks)
 	}
 	else
 	{
+		pthread_create(monitor, NULL, monitoring, d);
 		while (i < n)
 		{
 			pthread_create(&threads[i], NULL, routine, &d->philos[i]);
@@ -53,6 +55,7 @@ void	start(int n, pthread_t *threads, t_data *d, pthread_mutex_t *forks)
 			pthread_join(threads[i], NULL);
 			i++;
 		}
+		pthread_join(*monitor, NULL);
 	}
 	free(threads);
 	free_all(d, forks);
@@ -65,15 +68,17 @@ void	init(int argc, char **argv, t_data *d, pthread_mutex_t *forks)
 
 	i = 0;
 	n = ft_atoi(argv[1]);
-	while (i < n + 3)
+	while (i < n + 4)
 		pthread_mutex_init(&forks[i++], NULL);
 	d->print = &forks[n];
 	d->s = &forks[n + 1];
 	d->l = &forks[n + 2];
+	d->eat_lock = &forks[n + 3];
 	d->philo_count = n;
 	d->time_to_die = ft_atoi(argv[2]);
 	d->time_to_eat = ft_atoi(argv[3]);
 	d->time_to_sleep = ft_atoi(argv[4]);
+	d->full = 0;
 	if (argc == 6)
 		d->ne = ft_atoi(argv[5]);
 	i = 0;
@@ -87,13 +92,13 @@ void	init(int argc, char **argv, t_data *d, pthread_mutex_t *forks)
 		d->philos[i].right_fork = &forks[(i + 1) % n];
 		d->philos[i++].data = d;
 	}
-	printf("Number of threads: %d\n", n);
 }
 
 int	main(int argc, char **argv)
 {
 	int				n;
 	pthread_t		*threads;
+	pthread_t		*monitor;
 	t_data			*d;
 	pthread_mutex_t	*forks;
 
@@ -103,18 +108,22 @@ int	main(int argc, char **argv)
 	threads = malloc(sizeof(pthread_t) * n);
 	if (!threads)
 		return (printf("Error\n"), 1);
+	monitor = malloc(sizeof(pthread_t));
+	if (!monitor)
+		return (printf("Error\n"), free(threads), 1);
 	d = malloc(sizeof(t_data));
 	if (!d)
-		return (printf("Error\n"), free(threads), 1);
+		return (printf("Error\n"), free(threads), free(monitor), 1);
 	d->philos = malloc(sizeof(t_philo) * n);
 	if (!d->philos)
-		return (printf("Error\n"), free(threads), free(d), 1);
-	forks = malloc(sizeof(pthread_mutex_t) * (n + 3));
+		return (printf("Error\n"), free(threads), free(monitor), free(d), 1);
+	forks = malloc(sizeof(pthread_mutex_t) * (n + 4));
 	if (!forks)
-		return (printf("Error\n"), free(threads), free(d->philos), free(d), 1);
+		return (printf("Error\n"), free(threads), free(monitor), free(d->philos), free(d), 1);
 	d->stop = 0;
 	d->ne = -1;
 	init(argc, argv, d, forks);
-	start(n, threads, d, forks);
+	start(n, threads, d, forks, monitor);
 	return (0);
 }
+
