@@ -6,14 +6,14 @@
 #    By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/28 18:07:11 by kbossio           #+#    #+#              #
-#    Updated: 2025/09/23 15:51:20 by kbossio          ###   ########.fr        #
+#    Updated: 2025/09/24 10:48:56 by kbossio          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 CC = cc -Wall -Wextra -Werror
 INCLUDES = -I.
-SRCS = philosophers.c utils.c routine.c monitor.c
+SRCS = philosophers.c utils.c routine.c monitor.c routils.c
 OBJS = $(SRCS:.c=.o)
 
 %.o: %.c

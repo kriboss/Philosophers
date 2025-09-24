@@ -6,7 +6,7 @@
 /*   By: kbossio <kbossio@student.42firenze.it>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 15:40:52 by kbossio           #+#    #+#             */
-/*   Updated: 2025/09/23 21:52:53 by kbossio          ###   ########.fr       */
+/*   Updated: 2025/09/24 12:12:50 by kbossio          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ long long	get_ms(long long start)
 	return (ms);
 }
 
-int	smart_sleep(long long duration_ms)
+int	smart_sleep(long long duration_ms, t_philo *p)
 {
 	long long	start;
 	long long	now;
@@ -33,10 +33,11 @@ int	smart_sleep(long long duration_ms)
 	{
 		usleep(50);
 		now = get_ms(start);
+		if (check_stop(p))
+			return (1);
 	}
 	return (0);
 }
-
 
 int	check(char **argv)
 {
@@ -46,6 +47,13 @@ int	check(char **argv)
 	i = 1;
 	while (argv[i])
 	{
+		j = 0;
+		while (argv[i][j])
+		{
+			if ((argv[i][j] < '0' || argv[i][j] > '9') && argv[i][j] != '+')
+				return (1);
+			j++;
+		}
 		j = ft_atoi(argv[i]);
 		if (j <= 0)
 			return (1);
@@ -54,23 +62,27 @@ int	check(char **argv)
 	return (0);
 }
 
-void	free_all(t_data *data, pthread_mutex_t *forks)
+void	free_all(t_data *d, pthread_mutex_t *forks, pthread_t *th, pthread_t *m)
 {
 	int	i;
 
+	if (th)
+		free(th);
+	if (m)
+		free(m);
 	if (forks)
 	{
 		i = 0;
-		while (i < data->philo_count + 3)
+		while (i < d->philo_count + 3)
 		{
 			pthread_mutex_destroy(&forks[i]);
 			i++;
 		}
 		free(forks);
 	}
-	if (data->philos)
-		free(data->philos);
-	free(data);
+	if (d->philos)
+		free(d->philos);
+	free(d);
 }
 
 long	ft_atoi(const char *str)
@@ -90,7 +102,7 @@ long	ft_atoi(const char *str)
 	{
 		cont++;
 		if (str[i] == '-')
-			segno = -segno;
+			return (-1);
 		i++;
 	}
 	while (str[i] >= '0' && str[i] <= '9')
