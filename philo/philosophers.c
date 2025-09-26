@@ -54,7 +54,7 @@ void	start(int n, pthread_t *threads, t_data *d, pthread_mutex_t *forks)
 	free_all(d, forks, threads, d->monitor);
 }
 
-void	init_philos(t_data *d, pthread_mutex_t *forks)
+void	init_philos(t_data *d, pthread_mutex_t *forks, long long start)
 {
 	int	i;
 
@@ -64,7 +64,7 @@ void	init_philos(t_data *d, pthread_mutex_t *forks)
 		d->philos[i].id = i + 1;
 		d->philos[i].te = 0;
 		d->philos[i].l = 0;
-		d->philos[i].last_eat = 0;
+		d->philos[i].last_eat = start;
 		d->philos[i].left_fork = &forks[i];
 		d->philos[i].right_fork = &forks[(i + 1) % d->philo_count];
 		d->philos[i++].data = d;
@@ -75,6 +75,7 @@ void	init(int argc, char **argv, t_data *d, pthread_mutex_t *forks)
 {
 	int	i;
 	int	n;
+	long long tmp;
 
 	i = 0;
 	n = ft_atoi(argv[1]);
@@ -93,7 +94,8 @@ void	init(int argc, char **argv, t_data *d, pthread_mutex_t *forks)
 	d->full = 0;
 	if (argc == 6)
 		d->ne = ft_atoi(argv[5]);
-	init_philos(d, forks);
+	tmp = get_ms(0);
+	init_philos(d, forks, tmp);
 }
 
 int	main(int argc, char **argv)
@@ -103,7 +105,7 @@ int	main(int argc, char **argv)
 	t_data			*d;
 	pthread_mutex_t	*forks;
 
-	if ((argc != 5 && argc != 6) || check(argv) || ft_atoi(argv[1]) > 200)
+	if ((argc != 5 && argc != 6) || check(argv))
 		return (printf("Error\n"), 1);
 	n = ft_atoi(argv[1]);
 	threads = malloc(sizeof(pthread_t) * n);

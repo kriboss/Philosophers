@@ -37,8 +37,9 @@ void	print(char *fmt, int timestamp, t_philo *p)
 	pthread_mutex_unlock(p->data->s);
 }
 
-void	lock(t_philo *p, int start)
+int	lock(t_philo *p, int start)
 {
+	(void) start;
 	if (p->id % 2 == 0)
 	{
 		pthread_mutex_lock(p->left_fork);
@@ -56,6 +57,7 @@ void	lock(t_philo *p, int start)
 	pthread_mutex_lock(p->data->l);
 	p->l = 1;
 	pthread_mutex_unlock(p->data->l);
+	return (0);
 }
 
 int	check_stop(t_philo *p)
@@ -77,6 +79,7 @@ int	check_alive(t_philo *p)
 		|| (p->data->ne != -1 && p->te >= p->data->ne))
 	{
 		pthread_mutex_unlock(p->data->eat_lock);
+		print("%lldms %d died\n", get_ms(p->last_eat), p);
 		return (0);
 	}
 	pthread_mutex_unlock(p->data->eat_lock);

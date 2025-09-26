@@ -12,25 +12,28 @@
 
 #include "philosophers.h"
 
-void	check_death(t_data *d, t_philo *p)
+int	check_death(t_data *d, t_philo *p)
 {
 	pthread_mutex_lock(d->eat_lock);
 	if (get_ms(p->last_eat) >= d->time_to_die)
 	{
+		pthread_mutex_unlock(d->eat_lock);
 		print("%lldms %d died\n", get_ms(p->last_eat), p);
 		pthread_mutex_lock(d->s);
 		d->stop = 1;
 		pthread_mutex_unlock(d->s);
-		pthread_exit(NULL);
+		usleep(100000);
+		return (1);
 	}
 	pthread_mutex_unlock(d->eat_lock);
 	pthread_mutex_lock(d->s);
 	if (d->full == d->philo_count && d->ne != -1)
 	{
 		pthread_mutex_unlock(d->s);
-		pthread_exit(NULL);
+		return (1);
 	}
 	pthread_mutex_unlock(d->s);
+	return (0);
 }
 
 void	*monitoring(void *arg)
@@ -39,17 +42,19 @@ void	*monitoring(void *arg)
 	int		i;
 
 	d = (t_data *)arg;
-	usleep(100 * d->philo_count);
+	// usleep(150 * d->philo_count);
+	// usleep(d->time_to_die * 1000 *0.9);
 	while (1)
 	{
 		i = 0;
 		while (i < d->philo_count)
 		{
-			check_death(d, &d->philos[i]);
+			if (check_death(d, &d->philos[i]))
+				return (NULL);
 			i++;
 		}
 	}
-	pthread_exit(NULL);
+	return (NULL);
 }
 
 t_data	*allocating(int n, pthread_t *threads)

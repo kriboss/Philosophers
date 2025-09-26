@@ -31,7 +31,7 @@ int	smart_sleep(long long duration_ms, t_philo *p)
 	now = get_ms(start);
 	while (now < duration_ms)
 	{
-		usleep(50);
+		usleep(100);
 		now = get_ms(start);
 		if (check_stop(p))
 			return (1);

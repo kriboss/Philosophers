@@ -57,7 +57,7 @@ int			smart_sleep(long long duration_ms, t_philo *p);
 void		*lone_philo(void *arg);
 void		*routine(void *arg);
 void		eat(t_philo *p, int start);
-void		lock(t_philo *p, int start);
+int			lock(t_philo *p, int start);
 int			check_alive(t_philo *p);
 int			check_stop(t_philo *p);
 void		print(char *fmt, int timestamp, t_philo *p);

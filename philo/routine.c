@@ -35,12 +35,9 @@ void	ft_usleep(long long duration_ms)
 
 void	behaviour(t_philo *p, int start)
 {
-	while (check_alive(p))
+	while (1)
 	{
-		lock(p, start);
-		if (check_stop(p) || p->data->time_to_die <= get_ms(p->last_eat))
-			break ;
-		if (p->data->time_to_die <= get_ms(p->last_eat) || check_stop(p))
+		if (lock(p, start) || check_stop(p))
 			break ;
 		print("%lldms %d is eating\n", get_ms(start), p);
 		pthread_mutex_lock(p->data->eat_lock);
@@ -49,7 +46,7 @@ void	behaviour(t_philo *p, int start)
 		if (smart_sleep(p->data->time_to_eat, p) || check_stop(p))
 			break ;
 		eat(p, start);
-		if (p->data->time_to_die <= get_ms(p->last_eat) || check_stop(p)
+		if (check_stop(p)
 			|| (p->data->ne != -1 && p->te >= p->data->ne))
 			break ;
 		print("%lldms %d is sleeping\n", get_ms(start), p);
@@ -63,25 +60,29 @@ void	behaviour(t_philo *p, int start)
 void	*routine(void *arg)
 {
 	t_philo		*p;
-	long long	start;
+	// long long	start;
 
 	p = (t_philo *)arg;
-	start = get_ms(0);
+	// start = get_ms(0);
 	pthread_mutex_lock(p->data->eat_lock);
-	p->last_eat = start;
+	// p->last_eat = start;
 	pthread_mutex_unlock(p->data->eat_lock);
 	if (p->id % 2 == 0)
 		ft_usleep(ft_min(p->data->time_to_eat, p->data->time_to_sleep) * 0.9);
-	behaviour(p, start);
+	behaviour(p, p->last_eat);
+	pthread_mutex_lock(p->data->l);
 	if (p->l == 1)
 	{
 		pthread_mutex_unlock(p->left_fork);
 		pthread_mutex_unlock(p->right_fork);
 	}
+	pthread_mutex_unlock(p->data->l);
+	pthread_mutex_lock(p->data->s);
 	if (p->data->stop == 1)
-		pthread_exit(NULL);
+		return (pthread_mutex_unlock(p->data->s), NULL);
+	pthread_mutex_unlock(p->data->s);
 	pthread_mutex_lock(p->data->s);
 	p->data->full++;
 	pthread_mutex_unlock(p->data->s);
-	pthread_exit(NULL);
+	return (NULL);
 }
